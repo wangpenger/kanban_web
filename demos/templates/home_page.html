@@ -1,0 +1,556 @@
+﻿$def with (team_info,result,result_ongoing,result_pending,result_done)
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>Task Kanban board</title>
+	<link type="text/css" rel="stylesheet" href="static/css/jquery-ui.css">
+	<link rel="shortcut icon" type="image/ico" href="static/img/icon.ico" />
+	<style type="text/css">
+	/* Layout rules */
+	.equal {
+		display:table;
+		border-collapse:separate;
+	}
+	.row {
+		display:table-row;
+	}
+	.row div {
+		display:table-cell;
+	}
+	
+	/* Styling rules to make the example look nicer */
+	html,body {
+		margin:0;
+		padding:0;
+		color:#000;
+        background:	#99C;
+		padding:	0px; /* will add spacing from viewport around BODY */
+		display:	block !important;
+	}
+	body {
+		font:90%/140% "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+        height:97%;
+        overflow-x: hidden;  
+        overflow-y: hidden;
+        min-height:	350px;
+		min-width:	650px;
+	}
+	.equal {
+		margin:1px auto;
+		border-spacing:3px;
+		background:#256607;
+		width:100%;
+        min-height:6%;
+	}
+	.row div {
+        text-align:center;
+		/*background:#fff;*/
+	}
+	.row div.one {
+		width:28%;
+	}
+	.row div.two {
+		width:28%;   
+	}
+	.row div.three {
+        width:14%;
+	}
+	.row div h2 {
+		margin:0 0 0.5em 0;
+		padding:0.5em 10px;
+		font-size:1.2em;
+		color:#fff;
+		background:#595B30;
+	}
+	.row div p {
+		font-size:0.94em;
+		margin:0.5em 0;
+		padding:0 10px;
+	}
+	#labfooter {
+		text-align:center;
+	}
+    
+	ol{height:80%;margin:20px;position:relative;width:200px;}
+	.wish{color:#000;height:110px;padding:10px 20px 30px 20px;width:150px;}
+	.wish-close{background:url(static/img/wish_close_bg.png) no-repeat 0 0;display:none;position:absolute;right:5px;top:-5px;width:14px;height:14px;}
+    
+    .class_task_header {
+        font-weight: bold;
+        line-height: 10px;
+        text-align: left;
+        margin: 0px;
+        position:absolute;
+        font-size: 6px;
+        color: #555555;
+        top:5px;
+    }
+    .class_task_content {
+        text-align: left;
+        margin: 0px;
+        font-size: 14px;
+        color: #000000;
+    }
+    .class_task_owner {
+        font-weight: bold;
+        line-height: 8px;
+        text-align: right;
+        margin: 0px;
+        font-size: 12px;
+        color: #555555;
+        position:absolute;
+        right:5px;
+        bottom:3px;
+    }
+
+	</style>
+
+	<script type="text/javascript" src="static/js/jquery.js"></script>
+	<script type="text/javascript" src="static/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="static/js/my_tips_def.js"></script>
+    <script type="text/javascript" src="static/js/common_defined.js"></script>
+	<script type="text/javascript">
+	var isIE = !!window.ActiveXObject;
+    if(isIE)
+    {
+        var msg = "Recommended: Chrome(The Best)/Firefox, IE is unbefitting!";
+        alert(msg);
+        window.location = "action_error?info=Please change your browser to Chrome(The Best) or Firefox";
+    }
+    var task_status_backlog = 0;
+    var task_status_ongoing = 1;
+    var task_status_pending = 2;
+    var task_status_done = 3;
+
+	$$(document).ready(function(){
+		$$('ol').wish();
+		$$("div.tip_status_title").css({"font-weight":"bold","font-size":"15px"});
+        if(isIE)
+        {
+            oldText = $$('#kindly_remind').text();
+            $$('#kindly_remind').text(oldText+":Highly Recommended: Chrome(The Best)/Firefox, IE is unbefitting at present!");
+        }
+        $$('#timer').html(getTimeStr().split("|")[0]);
+        $$('#timer2').html(getTimeStr().split("|")[1]);
+        $$('div.row[id!=id_on_backlog]').css({'background':'#fff'});//only set the first in the row can take effect.
+        //$$('div.row[id!=id_on_ongoing]').css({'background':'#fff'});
+        //$$('div.row[id!=id_on_pending]').css({'background':'#fff'});
+        //$$('div.row[id!=id_on_done]').css({'background':'#fff'});
+        //$$('#board_banner').css({'text-align':'center'});
+        $$( "#menu_radio" ).buttonset();
+	});
+	$$(function(){
+		$$('li').draggable({ containment: "window" });
+		$$('#id_on_backlog').droppable({
+		   accept:	'.wish'
+		,  drop:	function (event, ui) 
+                    {
+                        if('id_on_backlog' != $$(ui.draggable).parent().parent().parent().attr("id"))
+                        {
+                            task_key_id = $$(ui.draggable).attr("id");
+                            task_key_id = task_key_id.split('_')[0];
+                            move_task(task_key_id,task_status_backlog);
+                        }
+                    } 
+		}); 
+		$$('#id_on_ongoing').droppable({
+		   accept:	'.wish'
+		,  drop:	function (event, ui) 
+                    {
+                        if('id_on_ongoing' != $$(ui.draggable).parent().parent().parent().attr("id"))
+                        {
+                            task_key_id = $$(ui.draggable).attr("id");
+                            task_key_id = task_key_id.split('_')[0];
+                            move_task(task_key_id,task_status_ongoing);
+                        }
+                    } 
+		}); 
+		$$('#id_on_pending').droppable({
+		   accept:	'.wish'
+		,  drop:	function (event, ui) 
+                    {
+                        if('id_on_pending' != $$(ui.draggable).parent().parent().parent().attr("id"))
+                        {
+                            task_key_id = $$(ui.draggable).attr("id");
+                            task_key_id = task_key_id.split('_')[0];
+                            move_task(task_key_id,task_status_pending);
+                        }
+                    } 
+		}); 
+		$$('#id_on_done').droppable({
+		   accept:	'.wish'
+		,  drop:	function (event, ui) 
+                    {
+                        if('id_on_done' != $$(ui.draggable).parent().parent().parent().attr("id"))
+                        {
+                            task_key_id = $$(ui.draggable).attr("id");
+                            task_key_id = task_key_id.split('_')[0];
+                            move_task(task_key_id,task_status_done);
+                        }
+                    }
+		}); 
+	});
+	
+	function open_creak_task()
+	{
+		var iWidth = 420;
+		var iHeight = 420;
+		var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
+		var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
+		var win = window.open("pre_create_task", "New Task", "width=" + iWidth + ", height=" + iHeight + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no, menubar=no, scrollbars=yes, resizable=no,location=no, status=no,alwaysRaised=yes,depended=yes,z-look=yes");
+	}
+    
+	function open_task_burn_page(id,task_id,task_name,task_effort,task_status,task_cost_id)
+	{
+		var iWidth = 420;
+		var iHeight = 420;
+		var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
+		var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
+		var win = window.open("pre_task_burn?id="+id+"&task_id="+task_id+"&task_name="+task_name+"&task_effort="+task_effort+"&task_status="+task_status+"&task_cost_id="+task_cost_id, "Task Burning", "width=" + iWidth + ", height=" + iHeight + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no, menubar=no, scrollbars=yes, resizable=no,location=no, status=no,alwaysRaised=yes,depended=yes");
+	}
+    
+    function show_task_detail(detail_id)
+    {
+        var detail = "";
+        var href_title = "";
+        current_show_id = detail_id.split('_')[0] + '_show';
+        if(isIE)
+        {
+            detail = document.getElementById(detail_id).innerText;
+            href_title = document.getElementById(current_show_id).innerText;
+        }
+        else
+        {
+            detail = document.getElementById(detail_id).textContent;
+            href_title = document.getElementById(current_show_id).textContent;
+        }
+        if(href_title.replace(/(^\s*)|(\s*$$)/g, "") == "more")
+        {
+            if(isIE) {document.getElementById(current_show_id).innerText = 'less';}
+            else {document.getElementById(current_show_id).textContent = 'less';}
+            document.getElementById(detail_id).style.visibility="visible";
+            //$$("#$$detail_id").css("visibility","visible")
+        }
+        else
+        {
+            document.getElementById(detail_id).style.visibility="hidden";
+            if(isIE) {document.getElementById(current_show_id).innerText = 'more';}
+            else {document.getElementById(current_show_id).textContent = 'more';}
+        }
+    }
+    
+    function delete_task(key_id){
+        if(confirm("Delete task:Yes or No?")){
+            $$.ajax({
+                type: "POST",
+                url: "action_delete_task",
+                data: "id="+key_id,
+                error: function(){alert('delete failed');},
+                success: function(data) {
+                    if (data == "True") {
+                        window.location.reload();
+                    }
+                    else {
+                        alert("delete failed");
+                    }
+                }
+            });
+        }
+        else
+        {
+            window.location.reload();
+        }
+    }
+    
+    function move_task(key_id, new_status){
+        $$.ajax({
+            type: "POST",
+            url: "action_move_taskcard",
+            data: "id="+key_id+"&new_status="+new_status,
+            error: function(){alert('move task failed!');},
+            success: function(data) {
+                if (data == "True") {
+                    window.location.reload();
+                }
+                else {
+                    alert("move task failed!");
+                }
+            }
+        });
+    }
+    
+    function currentTime(curr_date)
+    {
+        var d = curr_date;
+        var str = '';  
+        /**
+        str += d.getFullYear()+'-';
+        if(d.getMonth() + 1 < 10)
+        {
+            str += '0'
+        }
+        str  += d.getMonth() + 1+'-';
+        if(d.getDate() < 10)
+        {
+            str += '0'
+        }
+        str  += d.getDate()+' ';
+        **/
+        if(d.getHours() < 10)
+        {
+            str += '0'
+        }
+        str += d.getHours()+':';
+        if(d.getMinutes() < 10)
+        {
+            str += '0'
+        }
+       str  += d.getMinutes()+':';  
+       if(d.getSeconds() < 10)
+       {
+            str += '0'
+       }
+       str  += d.getSeconds();
+       return str; 
+    }
+    
+    function getTimeStr()
+    {
+        var curr = new Date();
+        var swedenTime = new Date();
+        var milli_sec = curr.getTime();
+        swedenTime.setTime(milli_sec - 7 * 3600 * 1000); //-7 hours when winter time, -6 hours when daylight saving time
+        return currentTime(curr) + "|" + currentTime(swedenTime);
+    }
+    setInterval(function(){$$('#timer').html(getTimeStr().split("|")[0])}, 1000);
+    setInterval(function(){$$('#timer2').html(getTimeStr().split("|")[1])}, 1000);
+	</script>
+    $def getPriority(value):
+        $if value == 1:
+            $ prior = 'High'
+        $elif value == 3:
+            $ prior = 'Low'
+        $elif value == 4:
+            $ prior = 'Opt.'
+        $else:
+            $ prior = 'Normal'
+        $return prior
+    $#///end def///
+</head>
+<body>
+<div class="equal" style="height:4%;">
+    <div class="row">
+        <div class="one">
+            <font size=5>
+            <br>
+            $if team_info is not None :
+                $team_info.getteam_name()
+            $else:
+                RnD Team
+            $#///end if///
+            </font>&nbsp;&nbsp;&nbsp;<font size=3>
+            $if team_info is not None :
+                $team_info.getname2()
+            $#///end if///
+            </font>
+        <div align="right">
+            <font size=3>
+                $if team_info is not None :
+                    Sprint$team_info.getcurrent_sprint_id() ($team_info.getsprint_week_no())
+                $else:
+                    Week???
+                $#///end if///
+            </font>
+        </div>
+        </div>
+    </div>
+</div>
+<div class="equal" style="height:85%;">
+    <div class="row">
+        <div class="one" id="id_on_backlog">
+        	<div class="tip_status_title">Backlog </div>
+            <div>
+            <a href="#" onclick='open_creak_task()'>
+                <img src="static/img/create_task.png" title="Create Task" alt="create task" height="28" width="28"/>
+            </a>
+            </div>
+            <div>
+            <!--note: in html, there is a space between $$ and the 
+                        word when defining new python variable.-->
+            <ol id="wish_backlog">
+            $if result is not None :
+                $for e in range(len(result)):
+                    <li id="$result[e][0]_task" value="$result[e][1]" ondblclick="open_task_burn_page('$result[e][0]','$result[e][1]','$result[e][2]','$result[e][13]','$result[e][6]','$result[e][18]')" title="you can double-click here..." style="background:url(static/img/wish_bg${result[e][10]}.png) no-repeat 0 0;">
+                        <div class="class_task_header">No.$result[e][1];&nbsp;&nbsp;$getPriority(result[e][5]);&nbsp;&nbsp;MH:$result[e][13]</br><a id="$result[e][0]_show" href="#" onclick="show_task_detail('$result[e][0]_detail')">more</a>
+                        </div>
+                        </br>
+                        <div class="class_task_content">&nbsp;&nbsp;$result[e][2]</div>
+                        
+                        <div class="class_task_owner">
+                        $ task_owners = result[e][20]
+                        $if task_owners.find('&') >= 0 or task_owners.find('ALL') >= 0:
+                            <img src="static/img/team_member_more.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $else:
+                            <img src="static/img/team_member.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $# end if
+                        $task_owners
+                        </div>
+                        
+                        <div id="$result[e][0]_detail" class="class_task_content" style="visibility:hidden;color:#FF0000">
+                         &nbsp;&nbsp;Used/Total:       $(result[e][13]-result[e][14])/$result[e][13];</br>
+                         &nbsp;&nbsp;$result[e][3];
+                        </div>
+                    </li>
+            $#///end if result///
+            </ol>
+            </div>
+        </div>
+        <div class="two" id="id_on_ongoing">
+        <div class="tip_status_title">Ongoing</div>
+        <br/>
+        <div>
+		<ol id="wish_on_ongoing">
+        $if result_ongoing is not None :
+            $for e in range(len(result_ongoing)):
+                <li id="$result_ongoing[e][0]_task" value="$result_ongoing[e][1]" ondblclick="open_task_burn_page('$result_ongoing[e][0]','$result_ongoing[e][1]','$result_ongoing[e][2]','$result_ongoing[e][13]','$result_ongoing[e][6]','$result_ongoing[e][18]')" title="you can double-click here..." style="background:url(static/img/wish_bg${result_ongoing[e][10]}.png) no-repeat 0 0;">
+                    <div class="class_task_header">
+                        No.$result_ongoing[e][1];&nbsp;&nbsp;$getPriority(result_ongoing[e][5]);&nbsp;&nbsp;MH:$result_ongoing[e][13]
+                    </br><a id="$result_ongoing[e][0]_show" href="#" onclick="show_task_detail('$result_ongoing[e][0]_detail')">more</a>
+                    </div>
+                    </br></br>
+                    <div class="class_task_content">&nbsp;&nbsp;$result_ongoing[e][2]</div>
+                    
+                    <div class="class_task_owner">
+                    $ task_owners = result_ongoing[e][20]
+                    $if task_owners.find('&') >= 0 or task_owners.find('ALL') >= 0:
+                        <img src="static/img/team_member_more.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                    $else:
+                        <img src="static/img/team_member.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                    $task_owners
+                    </div>
+                    
+                    <div id="$result_ongoing[e][0]_detail" class="class_task_content" style="visibility:hidden;color:#FF0000">
+                     &nbsp;&nbsp;Used/Total:       $(result_ongoing[e][13]-result_ongoing[e][14])/$result_ongoing[e][13];</br>
+                     &nbsp;&nbsp;$result_ongoing[e][3];
+                    </div>
+                </li>
+        $#///end if result_ongoing///
+		</ol> 
+        </div>        
+        </div>
+        <div class="three" id="id_on_pending">
+            <div class="tip_status_title">Pending</div>
+            <br/>
+            <div>
+            <!--note: in html, there is a space between $$ and the 
+                        word when defining new python variable.-->
+            <ol id="wish_pending">
+            $if result_pending is not None :
+                $for e in range(len(result_pending)):
+                    <li id="$result_pending[e][0]_task" value="$result_pending[e][1]" ondblclick="open_task_burn_page('$result_pending[e][0]','$result_pending[e][1]','$result_pending[e][2]','$result_pending[e][13]','$result_pending[e][6]','$result_pending[e][18]')" title="you can double-click here..." style="background:url(static/img/wish_bg${result_pending[e][10]}.png) no-repeat 0 0;">
+                        <div class="class_task_header">
+                            No.$result_pending[e][1];&nbsp;&nbsp;$getPriority(result_pending[e][5]);&nbsp;&nbsp;MH:$result_pending[e][13]
+                        </br><a id="$result_pending[e][0]_show" href="#" onclick="show_task_detail('$result_pending[e][0]_detail')">more</a>
+                        </div>
+                        </br></br>
+                        <div class="class_task_content">&nbsp;&nbsp;$result_pending[e][2]</div>
+                        
+                        <div class="class_task_owner">
+                        $ task_owners = result_pending[e][20]
+                        $if task_owners.find('&') >= 0 or task_owners.find('ALL') >= 0:
+                            <img src="static/img/team_member_more.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $else:
+                            <img src="static/img/team_member.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $#end if
+                        $task_owners
+                        </div>
+                        
+                        <div id="$result_pending[e][0]_detail" class="class_task_content" style="visibility:hidden;color:#FF0000">
+                         &nbsp;&nbsp;Used/Total:       $(result_pending[e][13]-result_pending[e][14])/$result_pending[e][13];</br>
+                         &nbsp;&nbsp;$result_pending[e][3];
+                        </div>
+                    </li>
+            $#///end if result_pending///
+            </ol>
+            </div>
+        </div>
+        <div class="three" id="id_on_done">
+            <div class="tip_status_title">Done</div>
+            <br/>
+            <div>
+            <!--note: in html, there is a space between $$ and the 
+                        word when defining new python variable.-->
+            <ol id="wish_done">
+            $if result_done is not None :
+                $for e in range(len(result_done)):
+                    <li id="$result_done[e][0]_task" value="$result_done[e][1]" ondblclick="open_task_burn_page('$result_done[e][0]','$result_done[e][1]','$result_done[e][2]','$result_done[e][13]','$result_done[e][6]','$result_done[e][18]')" title="you can double-click here..." style="background:url(static/img/wish_bg${result_done[e][10]}.png) no-repeat 0 0;">
+                        <div class="class_task_header">
+                            No.$result_done[e][1];&nbsp;&nbsp;$getPriority(result_done[e][5]);&nbsp;&nbsp;MH:$result_done[e][13]
+                        </br><a id="$result_done[e][0]_show" href="#" onclick="show_task_detail('$result_done[e][0]_detail')">more</a>
+                        </div>
+                        </br></br>
+                        <div class="class_task_content">&nbsp;&nbsp;$result_done[e][2]</div>
+                        
+                        <div class="class_task_owner">
+                        $ task_owners = result_done[e][20]
+                        $if task_owners.find('&') >= 0 or task_owners.find('ALL') >= 0:
+                            <img src="static/img/team_member_more.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $else:
+                            <img src="static/img/team_member.png" title="Owner" alt="Owner:" height="20" width="20"/>
+                        $#///end if///
+                        $task_owners
+                        </div>
+                        
+                        <div id="$result_done[e][0]_detail" class="class_task_content" style="visibility:hidden;color:#FF0000">
+                         &nbsp;&nbsp;Used/Total:       $(result_done[e][13]-result_done[e][14])/$result_done[e][13];</br>
+                         &nbsp;&nbsp;$result_done[e][3];
+                        </div>
+                    </li>
+            $#///end if result///
+            </ol>
+            </div>
+        </div>
+        <div class="three" id="id_feature_plan">
+            <div>
+                <div class="tip_status_title">Feature Plan</div>
+                <br/>	
+                    <a href="http//www.zhihu.com" style="color:blue">zhihu</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="equal" id="menu_list">
+    <div class="row">
+        <div class="one">
+        <table width="100%">
+             <tr>
+                 <td id="task_activity">
+                    <div id="menu_radio">
+                        <input type="radio" id="sub_func1" name="sub_func" value="1" onclick="goto_func(1)" checked="checked">
+                            <label for="sub_func1" style="color:green">Task Activity</label>
+                        <input type="radio" id="sub_func2" name="sub_func" value="2">
+                            <label for="sub_func2" style="color:green" onclick="goto_func(2)">Burn Down</label>
+                        <input type="radio" id="sub_func3" name="sub_func" value="3">
+                        <!--We did yesterday-->
+                        <!--Setting-->
+                            <label for="sub_func3" style="color:green" onclick="goto_func(3)">We did yesterday</label>
+                        <input type="radio" id="sub_func4" name="sub_func" value="4">
+                            <label for="sub_func4" style="color:green" onclick="goto_func(4)">Setting</label>
+                    </div>
+                 </td>
+                 <td id="kindly_remind"></td>
+                 <td align="right">
+                    <img src="static/img/china.png" title="China" alt="China" height="20" width="20"/>
+                    <b id="timer"></b>&nbsp;&nbsp;
+                    <img src="static/img/sweden.png" title="Sweden" alt="Sweden" height="20" width="20"/>
+                    <b id="timer2"></b>
+                 </td>
+             </tr>
+        </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+	

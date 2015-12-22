@@ -1,0 +1,98 @@
+$def with (x_axis_day_index,ideal_burndown,actualBurnedArray)
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>  
+<head>  
+<title>Burn Down Chart</title>  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="burn down" />  
+<meta name="description" content="task burn down chart" /> 
+<link rel="shortcut icon" type="image/ico" href="static/img/burn_chart.ico" />
+<link type="text/css" rel="stylesheet" href="static/css/jquery-ui.css">
+<style type="text/css">
+    #menu_radio {
+        position:fixed;
+        left:0px;
+        bottom:0;
+        _position:absolute;
+        _top:expression(document.documentElement.clientHeight + document.documentElement.scrollTop - this.offsetHeight);
+    }
+</style>
+<script type="text/javascript" src="static/js/jquery.js"></script>
+<script type="text/javascript" src="static/js/jquery-ui.js"></script>
+<script type="text/javascript" src="static/js/highcharts.js"></script>
+<script type="text/javascript" src="static/js/common_defined.js"></script>
+<script type="text/javascript">
+    $$(document).ready(function(){
+        $$( "#menu_radio" ).buttonset();
+    });
+    $$(function () {
+        $$('#container').highcharts({
+            credits: {
+             enabled:false
+            },
+            colors: ['#90ed7d', '#f7a35c', '#7cb5ec', '#434348', '#8085e9','#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1'],
+            title: {
+                text: 'Burn Down of Sprint',
+                x: -20, //center
+                style: {
+                    color: '#000000',
+                    fontWeight: 'bold'
+                }
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+             title: {
+                    text: 'The workday of sprint'
+                },
+                categories: $x_axis_day_index
+            },
+            yAxis: {
+                title: {
+                    text: 'Hours (MH)'
+                },
+                min: 0,         //add this to remove the negative in Y-axis.
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: 'MH'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'Ideal burned line',
+                data: $ideal_burndown
+            }, {
+                name: 'Current burned line',
+                data: $actualBurnedArray
+            }]
+        });
+    });
+</script>
+</head> 
+<body>
+    <div id="container" style="min-width: 92%; height: 92%; margin: 0 auto"></div>
+    <div id="menu_radio">
+        <input type="radio" id="sub_func1" name="sub_func" value="1" onclick="goto_func(1)">
+            <label for="sub_func1" style="color:green">Task Activity</label>
+        <input type="radio" id="sub_func2" name="sub_func" value="2" checked="checked">
+            <label for="sub_func2" style="color:green" onclick="goto_func(2)">Burn Down</label>
+        <input type="radio" id="sub_func3" name="sub_func" value="3">
+        <!--We did yesterday-->
+        <!--Setting-->
+            <label for="sub_func3" style="color:green" onclick="goto_func(3)">We did yesterday</label>
+        <input type="radio" id="sub_func4" name="sub_func" value="4">
+            <label for="sub_func4" style="color:green" onclick="goto_func(4)">Setting</label>
+    </div>
+</body> 
+</html> 

@@ -1,0 +1,24 @@
+﻿$def with (info)
+<!doctype html>
+<html>
+	<head>
+		<title>Error Page</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<link rel="shortcut icon" type="image/ico" href="static/img/error_page.ico" />
+		<script type="text/javascript" src="static/js/jquery.js"></script>
+		<script type="text/javascript">
+			$$(document).ready(function(){
+				$$("body").css("background-color","#FFFFCE");
+				$$("div").css("text-align", "center");
+			});
+	   </script>
+	</head>
+	<body>
+	<div>
+		$if info:
+			Error page, message[$info]
+		$else:
+			Error page!
+	</div>
+	</body>
+</html>

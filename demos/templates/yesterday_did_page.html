@@ -1,0 +1,99 @@
+$def with (result)
+<!doctype html>
+<html lang="us">
+	<head>
+		<title>We Did Yesterday</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<link rel="shortcut icon" type="image/ico" href="static/img/we_did.ico" />
+		<link href="static/css/jquery-ui.css" rel="stylesheet">
+		<link href="static/css/jquery.multiselect.css" rel="stylesheet">
+    <style type="text/css">
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+        text-align:center;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+        text-align:center;
+    }
+    #menu_radio {
+        position:fixed;
+        left:0px;
+        bottom:0;
+        _position:absolute;
+        _top:expression(document.documentElement.clientHeight + document.documentElement.scrollTop - this.offsetHeight);
+    }
+</style>
+	</style>
+	<script type="text/javascript" src="static/js/jquery.js"></script>
+	<script type="text/javascript" src="static/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="static/js/common_defined.js"></script>
+	<script type="text/javascript">
+		$$(document).ready(function(){
+			//$$("body").css("background-color","#FFFFCE");
+            $$( "#menu_radio" ).buttonset();
+		});
+	</script>
+	</head>
+<body>
+ <form id="form_yesterday_did" method="post" action="action_yesterday_did" autocomplete = "off">
+    <br/><br/>
+    <div>
+        <table id="id_yesterday_did" class="gridtable">
+            <tr>
+                <th width="8%"> Date: </th>
+                <th width="30%"> Task: </th>
+                <th width="10%"> Owner: </th>
+                <th width="10%"> Burned(hours): </th>
+                <th width="10%"> Contributor:</th>
+                <th>Comment:</th>
+            </tr>
+    $if result is not None:
+        $for e in range(len(result)):
+            <tr>
+            <td>$result[e][2]</td>
+            <td>$result[e][0]</td>
+            <td>$result[e][5]</td>
+            <td>$result[e][3]</td>
+            <td>$result[e][6]</td>
+            <td></td>
+            </tr>
+    $elif len(result) == 0:
+            <tr>
+                <td>no data yesterday!</td>
+            </tr>
+    $#end if
+        </table>
+    </div>
+    
+    <div id="menu_radio">
+        <input type="radio" id="sub_func1" name="sub_func" value="1" onclick="goto_func(1)">
+            <label for="sub_func1" style="color:green">Task Activity</label>
+        <input type="radio" id="sub_func2" name="sub_func" value="2">
+            <label for="sub_func2" style="color:green" onclick="goto_func(2)">Burn Down</label>
+        <input type="radio" id="sub_func3" name="sub_func" value="3" checked="checked">
+        <!--We did yesterday-->
+        <!--Setting-->
+            <label for="sub_func3" style="color:green" onclick="goto_func(3)">We did yesterday</label>
+        <input type="radio" id="sub_func4" name="sub_func" value="4">
+            <label for="sub_func4" style="color:green" onclick="goto_func(4)">Setting</label>
+    </div>
+</form>
+</body>
+</html>

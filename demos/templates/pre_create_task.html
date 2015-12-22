@@ -1,0 +1,142 @@
+﻿$def with (result)
+<!doctype html>
+<html lang="us">
+	<head>
+		<title>Create New Task</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<link rel="shortcut icon" type="image/ico" href="static/img/new_task.ico" />
+		<link href="static/css/jquery-ui.css" rel="stylesheet">
+		<link href="static/css/jquery.multiselect.css" rel="stylesheet">
+	<style>
+	</style>
+	<script type="text/javascript" src="static/js/jquery.js"></script>
+	<script type="text/javascript" src="static/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="static/js/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="static/js/jquery_multiselect_min.js"></script>
+	<script type="text/javascript">
+		$$(document).ready(function(){
+			$$("body").css("background-color","#fbf6cc");
+			$$( "select" ).css("width","200px");
+			$$( "input[type=text]" ).css("width","200px");
+			$$("#task_priority").selectmenu();
+			$$("#task_owner").multiselect({
+			   multiple: true,
+			   header: false,
+			   selectedText: function(numChecked, numTotal, checkedItems){
+				  var checked="";
+				  for(var i=0; i<numChecked; i++)
+				  {
+					checked += checkedItems[i].value + "|";
+				  }
+				  if(checked.length > 0)
+				  {
+					checked = checked.substr(0, checked.length - 1);
+				  }
+				  $$("#hidden_task_owner").val(checked);
+				  return numChecked + ' person ' + ' selected';
+			   }
+			});
+			$$("#task_owner").multiselect("uncheckAll");
+            $$( "#radioset" ).buttonset();
+            $$( "#task_color1" ).click(function(){
+                $$("body").css("background-color","#fbf6cc");
+            });
+            $$( "#task_color2" ).click(function(){
+                $$("body").css("background-color","#F9DAD6");
+            });
+            $$( "#task_color3" ).click(function(){
+                $$("body").css("background","#a9d5af");
+            });
+			self.focus();
+
+			$$("#create_task_form").validate();
+		});
+		
+		function submit_form()
+		{
+			$$("#create_task_form").submit(); 
+		}
+	</script>
+	</head>
+<body>
+ <form id="create_task_form" method="post" action="action_create_task" autocomplete = "off">
+	<input type="hidden" id="hidden_task_owner" name="task_owner" value=""/>
+    <table id="id_create_task_tb">
+        <tr>
+            <td width="35%"><h4>Task Name:</h4></td>
+            <td class="">
+				<div>
+					<textarea id="task_name" name="task_name" rows="3" cols="26" class="required" maxlength="50"></textarea>
+				</div>
+			</td>
+        </tr>
+        <tr>
+            <td> <h4>Remarks: </h4></td>
+            <td class="">
+				<div>
+					<textarea id="remarks" name="remarks" rows="3" cols="26" maxlength="20"></textarea>
+				</div>
+			</td>
+        </tr>
+		
+        <tr>
+            <td><h4>Task Effort:</h4></td>
+            <td class="">
+				<div>
+					<input type="text" id="task_effort" name="task_effort" class="required digits"/>
+				</div>
+			</td>
+        </tr>
+		
+		<tr>
+            <td > <h4>Owner: </h4></td>
+            <td>
+				<div>
+					<select id="task_owner">
+						$if result is not None:
+							$for e in range(len(result)):
+								<option value="$result[e][0]">$result[e][3]</option>
+					</select>
+				</div>
+			</td>
+        </tr>
+        
+		<tr>
+            <td><h4>Priority:</h4></td>
+            <td>
+				<div>
+					<select id="task_priority" name="task_priority">
+						<option value="1">High</option>
+						<option selected="selected" value="2">Normal</option>
+						<option value="3">Low</option>
+                        <option value="4">Optional</option>
+					</select>
+				</div>
+			</td>
+        </tr>
+        
+		<tr>
+            <td><h4>Color:</h4></td>
+            <td>
+                <div id="radioset">
+                    <input type="radio" id="task_color1" name="task_color" value="1" checked="checked">
+                        <label for="task_color1" style="color:yellow">▇</label>
+                    <input type="radio" id="task_color2" name="task_color" value="2">
+                        <label for="task_color2" style="color:pink">▇</label>
+                    <input type="radio" id="task_color3" name="task_color" value="3">
+                        <label for="task_color3" style="color:green">▇</label>
+                </div>
+			</td>
+        </tr>
+		<tr>
+            <td colspan="2" align="center">
+				<div >
+					<input type="submit" id="create_task_submit" value="Submit" class="submit" onclick="submit_form()"/>
+                    <input type="button" id="create_task_cancel" value="Cancel" class="submit" onclick="javascript:window.close();"/>
+				</div>
+    		</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
