@@ -29,7 +29,7 @@
 		display:	block !important;
 	}
 	body {
-		font:90%/140% "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+		font:90%/145% "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
         height:97%;
         overflow-x: hidden;  
         overflow-y: hidden;
@@ -56,6 +56,9 @@
 	.row div.three {
         width:14%;
 	}
+    
+    .class_card_area{float:left}
+    
 	.row div h2 {
 		margin:0 0 0.5em 0;
 		padding:0.5em 10px;
@@ -72,8 +75,8 @@
 		text-align:center;
 	}
     
-	ol{height:80%;margin:20px;position:relative;width:200px;}
-	.wish{color:#000;height:110px;padding:10px 20px 30px 20px;width:150px;}
+	ol{height:90%;margin:10px;position:relative;width:200px;}
+	.wish{color:#000;height:110px;padding:10px 20px 30px 20px;width:160px;}
 	.wish-close{background:url(static/img/wish_close_bg.png) no-repeat 0 0;display:none;position:absolute;right:5px;top:-5px;width:14px;height:14px;}
     
     .class_task_header {
@@ -114,9 +117,9 @@
 	var isIE = !!window.ActiveXObject;
     if(isIE)
     {
-        var msg = "Recommended: Chrome(The Best)/Firefox, IE is unbefitting!";
+        var msg = "Recommended: Chrome(preferred)/Firefox, IE is unbefitting!";
         alert(msg);
-        window.location = "action_error?info=Please change your browser to Chrome(The Best) or Firefox";
+        window.location = "action_error?info=Please change your browser to Chrome(preferred) or Firefox";
     }
     var task_status_backlog = 0;
     var task_status_ongoing = 1;
@@ -124,7 +127,10 @@
     var task_status_done = 3;
 
 	$$(document).ready(function(){
-		$$('ol').wish();
+        //$$('ol').wish(); // use the below to replace this code for we need to separate each area and calculate card position.
+        $$('ol').each(function(){
+            $$(this).wish();
+        });
 		$$("div.tip_status_title").css({"font-weight":"bold","font-size":"15px"});
         if(isIE)
         {
@@ -375,7 +381,7 @@
                 <img src="static/img/create_task.png" title="Create Task" alt="create task" height="28" width="28"/>
             </a>
             </div>
-            <div>
+            <div class="class_card_area">
             <!--note: in html, there is a space between $$ and the 
                         word when defining new python variable.-->
             <ol id="wish_backlog">
@@ -409,7 +415,7 @@
         <div class="two" id="id_on_ongoing">
         <div class="tip_status_title">Ongoing</div>
         <br/>
-        <div>
+        <div class="class_card_area">
 		<ol id="wish_on_ongoing">
         $if result_ongoing is not None :
             $for e in range(len(result_ongoing)):
@@ -442,7 +448,7 @@
         <div class="three" id="id_on_pending">
             <div class="tip_status_title">Pending</div>
             <br/>
-            <div>
+            <div class="class_card_area">
             <!--note: in html, there is a space between $$ and the 
                         word when defining new python variable.-->
             <ol id="wish_pending">
@@ -478,7 +484,7 @@
         <div class="three" id="id_on_done">
             <div class="tip_status_title">Done</div>
             <br/>
-            <div>
+            <div class="class_card_area">
             <!--note: in html, there is a space between $$ and the 
                         word when defining new python variable.-->
             <ol id="wish_done">

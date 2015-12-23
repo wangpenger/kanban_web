@@ -22,7 +22,7 @@ $def with (task_info, person_result)
                 maxDate: "+0M +0D"
             });
 			$$("#task_owner_select").multiselect({
-			   multiple: true,
+			   multiple: false,
 			   header: false,
 			   selectedText: function(numChecked, numTotal, checkedItems){
 				  var checked="";
@@ -35,7 +35,8 @@ $def with (task_info, person_result)
 					checked = checked.substr(0, checked.length - 1);
 				  }
                   $$("#hidden_task_owner").val(checked);
-				  return numChecked + ' person ' + ' selected';
+				  //return numChecked + ' person ' + ' selected';
+                  return $$("#task_owner_select option:selected").text();
 			   },
                noneSelectedText: function() {
                   return '0 person selected';
