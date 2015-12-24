@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Task Kanban board</title>
+	<title>Task Kanban Board</title>
 	<link type="text/css" rel="stylesheet" href="static/css/jquery-ui.css">
 	<link rel="shortcut icon" type="image/ico" href="static/img/icon.ico" />
 	<style type="text/css">
@@ -30,7 +30,7 @@
 	}
 	body {
 		font:90%/145% "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
-        height:97%;
+        height:90%;
         overflow-x: hidden;  
         overflow-y: hidden;
         min-height:	350px;
@@ -40,8 +40,9 @@
 		margin:1px auto;
 		border-spacing:3px;
 		background:#256607;
+        height:100%;
 		width:100%;
-        min-height:6%;
+        min-height:4%;
 	}
 	.row div {
         text-align:center;
@@ -200,8 +201,8 @@
 	
 	function open_creak_task()
 	{
-		var iWidth = 420;
-		var iHeight = 420;
+		var iWidth = 450;
+		var iHeight = 450;
 		var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
 		var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
 		var win = window.open("pre_create_task", "New Task", "width=" + iWidth + ", height=" + iHeight + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no, menubar=no, scrollbars=yes, resizable=no,location=no, status=no,alwaysRaised=yes,depended=yes,z-look=yes");
@@ -209,8 +210,8 @@
     
 	function open_task_burn_page(id,task_id,task_name,task_effort,task_status,task_cost_id)
 	{
-		var iWidth = 420;
-		var iHeight = 420;
+		var iWidth = 450;
+		var iHeight = 450;
 		var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
 		var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
 		var win = window.open("pre_task_burn?id="+id+"&task_id="+task_id+"&task_name="+task_name+"&task_effort="+task_effort+"&task_status="+task_status+"&task_cost_id="+task_cost_id, "Task Burning", "width=" + iWidth + ", height=" + iHeight + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no, menubar=no, scrollbars=yes, resizable=no,location=no, status=no,alwaysRaised=yes,depended=yes");
@@ -372,7 +373,7 @@
         </div>
     </div>
 </div>
-<div class="equal" style="height:85%;">
+<div class="equal" style="height:90%;">
     <div class="row">
         <div class="one" id="id_on_backlog">
         	<div class="tip_status_title">Backlog </div>

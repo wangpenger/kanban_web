@@ -60,9 +60,14 @@ $def with (task_info, person_result)
                 alert("Please choose at least one person!");
             }
 		}
+        function closeIt() 
+        {
+            //60s auto close.
+            setTimeout("self.close()",60000);
+        }
 	</script>
 	</head>
-<body>
+<body onload="closeIt()">
  <form id="task_burn_form" method="post" action="action_task_burn" autocomplete = "off">
 	<input type="hidden" id="hidden_task_owner" name="task_owner" value=""/>
     <input type="hidden" id="task_status" name="task_status" value="$task_info.gettask_status()"/>

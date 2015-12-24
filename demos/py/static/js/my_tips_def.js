@@ -55,7 +55,7 @@
             //remove old algorithm for the random height of each card, but it's not very good-looking for large-scale screen( just so so for laptop).
 			var orderID = _self.val();
 
-            _left_pos = Math.random();
+            _left_pos = Math.random() * 2;
             
             task_key_id = _self.attr("id");
             task_key_id = task_key_id.split('_')[0];

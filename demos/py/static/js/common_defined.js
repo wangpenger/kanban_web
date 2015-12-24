@@ -20,7 +20,7 @@ function goto_func(id)
         case 4:
         {
             window.location = "setting";
-            window.location = "action_error?info=only for administrator!";
+            window.location = "action_error?info=Only for administrator!";
             break;
         }
         default:

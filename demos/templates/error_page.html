@@ -10,15 +10,17 @@
 			$$(document).ready(function(){
 				$$("body").css("background-color","#FFFFCE");
 				$$("div").css("text-align", "center");
+                $$("div").css("font-size", "30px");
 			});
 	   </script>
 	</head>
 	<body>
 	<div>
 		$if info:
-			Error page, message[$info]
+			Error Message:[$info]
+			<br>Please return!
 		$else:
-			Error page!
+			Error page! Please return!
 	</div>
 	</body>
 </html>

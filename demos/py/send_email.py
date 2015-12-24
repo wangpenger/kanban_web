@@ -13,6 +13,10 @@ import logging
 import logging.config
 import sqlite3_crud
 import data_element
+
+PATH_LOG_CONF = '/home/your user name/proj2/conf/logger.conf'
+logging.config.fileConfig(PATH_LOG_CONF)
+logger = logging.getLogger("example02")
  
 #server['name'], server['user'], server['passwd']
 def send_mail(server, fro, to, subject, text, files=[]): 
@@ -41,7 +45,7 @@ def send_mail(server, fro, to, subject, text, files=[]):
     smtp.sendmail(fro, to, msg.as_string()) 
     smtp.close()
     
-def getUnfilledTeamMembers(self, data):
+def getUnfilledTeamMembers(data):
     conn = sqlite3_crud.get_conn(sqlite3_crud.DB_FILE_PATH)
     fetch_sql = 'select reserved from team_members_info where id != 0 and id not in  \
                  (select b.reserved from task_info a,daily_cost b where a.task_id = b.task_id and b.cost_day = ?)'
@@ -60,16 +64,16 @@ def sendEmailTimer():
     weekNo = time.strftime('%w', yesterday)
     if weekNo != '0' and weekNo != '6':
         str_yesterday = time.strftime('%m/%d/%Y', yesterday)
-        data = (str_yesterday)
+        data = [str_yesterday]
         result = getUnfilledTeamMembers(data)
         if result is not None:
             if len(result) > 0:
                 server = {"name" : "smtp.sina.com", "user" : "xxx", "passwd" : "xxx"}
                 fro = 'xxx@sina.com'
-                to = result
-                subject = 'Just a kind reminder that you did not record your task burndown info in kanban!'
+                email_to = [i[0] for i in result]
+                subject = 'Just a kind reminder that please record your task burndown info in kanban!'
                 text = 'http://xxx.xxx.xxx.xxx:8080/kanban       Uncommitted date:[' + str_yesterday + ']'
-                send_mail(server, fro, to, subject, text)
+                send_mail(server, fro, email_to, subject, text)
     t = threading.Timer(1 * 24 * 3600, sendEmailTimer)
     t.start()
     
